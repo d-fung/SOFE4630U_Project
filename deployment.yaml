@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visualizer-api-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: visualizer-api
+  template:
+    metadata:
+      labels:
+        app: visualizer-api
+    spec:
+      containers:
+      - name: visualizer-api
+        image: northamerica-northeast2-docker.pkg.dev/oceanic-granite-413404/sofe4630u/visualizer_api
+        ports:
+        - containerPort: 8000
