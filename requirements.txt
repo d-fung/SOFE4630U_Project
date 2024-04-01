@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+google-cloud-bigquery
+google-cloud-storage
+google-cloud-pubsub
+pandas
+Pillow
+matplotlib
