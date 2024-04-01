@@ -6,8 +6,8 @@ url = "http://127.0.0.1:8000/create-video/"
 
 # Define the JSON payload to send to the API
 data = {
+    "vehicle_id": 50,
     "table_name": "01_tracks",
-    "vehicle_id": 1,
     "numLaneChanges": 1
 }
 
