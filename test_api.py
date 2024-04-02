@@ -1,10 +1,10 @@
 
 import requests
 
-# Define the URL of the API endpoint
+# URL of the API endpoint
 url = "http://127.0.0.1:8000/create-video/"
 
-# Define the JSON payload to send to the API
+# Example JSON payload to send to the API
 data = {
     "vehicle_id": 50,
     "table_name": "01_tracks",

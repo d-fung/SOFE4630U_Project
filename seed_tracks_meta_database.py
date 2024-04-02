@@ -13,7 +13,7 @@ try:
     # Execute the command and capture the output
     csv_files = subprocess.check_output(cmd_list_files, shell=True, text=True).splitlines()
 
-    # Define a regex pattern to match files
+    # Use Regex so we only uploading tracksMeta CSV files
     pattern = re.compile(r'^.*/(\d{2}_tracksMeta)\.csv$')
 
     for file_path in csv_files:
@@ -22,7 +22,6 @@ try:
             # Extract table name from the regex group
             table_name = match.group(1)
             # Construct the BigQuery load command
-            # Here, explicitly specify the project ID with the dataset
             cmd_load = (
                 f'bq load --source_format=CSV --autodetect '
                 f'--field_delimiter=, '

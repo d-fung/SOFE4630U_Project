@@ -3,6 +3,7 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.io.gcp.bigquery import ReadFromBigQuery, WriteToBigQuery
 from google.cloud import bigquery
 
+## Queries the HighD_meta dataset for all the tables and joins them together using a union query
 def construct_union_query(dataset_id, project_id):
     client = bigquery.Client(project=project_id)
     tables = client.list_tables(dataset_id)
@@ -16,7 +17,7 @@ def construct_union_query(dataset_id, project_id):
     union_query = " UNION ALL ".join(query_parts)
     return union_query
 
-
+# Runs the main pipeline to filter datasets
 def run_union_pipeline(project_id, dataset_id, output_table_id, pipeline_args):
     union_query = construct_union_query(dataset_id, project_id)
     pipeline_args.extend([
@@ -26,6 +27,7 @@ def run_union_pipeline(project_id, dataset_id, output_table_id, pipeline_args):
     ])
     pipeline_options = PipelineOptions(pipeline_args, save_main_session=True)
     
+    # Main pipeline execution
     with beam.Pipeline(options=pipeline_options) as p:
         filtered_rows = (p 
                          | 'Read Unioned Tables' >> ReadFromBigQuery(
@@ -34,6 +36,7 @@ def run_union_pipeline(project_id, dataset_id, output_table_id, pipeline_args):
                              project=project_id)
                         )
         
+        # Writes data back to BigQuery dataset
         filtered_rows | 'Write to BigQuery' >> WriteToBigQuery(
             output_table_id,
             schema='SCHEMA_AUTODETECT',

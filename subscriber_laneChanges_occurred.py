@@ -10,11 +10,12 @@ subscription_path = subscriber.subscription_path(project_id, subscription_id)
 
 fastapi_url = '"http://127.0.0.1:8000/create-video/"'
 
+# Callback function will call the visualization API service
 
 def callback(message):
     data = json.loads(message.data.decode("utf-8"))
     print(f"Data: {data}")
-    # Send a POST request to your FastAPI application
+    # Send a POST request to the FastAPI application
     try:
         response = requests.post(fastapi_url, json=data)
         if response.status_code == 200:
@@ -26,6 +27,7 @@ def callback(message):
         
     message.ack()
 
+# Main function to keep listening for messages
 def listen_for_messages():
     streaming_pull_future = subscriber.subscribe(subscription_path, callback=callback)
     print(f"Listening for messages on {subscription_path}...")
@@ -34,8 +36,8 @@ def listen_for_messages():
     try:
         streaming_pull_future.result()
     except KeyboardInterrupt:
-        streaming_pull_future.cancel()  # Trigger the shutdown
-        streaming_pull_future.result()  # Block until the shutdown is complete
+        streaming_pull_future.cancel()
+        streaming_pull_future.result()
 
 if __name__ == "__main__":
     listen_for_messages()

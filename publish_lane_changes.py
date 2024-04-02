@@ -39,7 +39,8 @@ def query_and_publish():
         print(f"Failed to execute BigQuery query: {e}")
 
     for row in query_job:
-        # Assuming 'numLaneChanges' is the column to check
+        
+        # Creatse a data dictionary object that will be published to the topic
         numLaneChanges = row["numLaneChanges"]
         id = row["id"]
         table_name = row["table_name"]

@@ -24,6 +24,7 @@ storage_client = storage.Client()
 
 bucket = storage_client.bucket('oceanic-granite-413404-bucket')
 
+# Queries the HighD_tracks database to return all the frames that the vehicle ID is in
 def query_database(table_name, vehicle_id):
     query = f"""
     SELECT frame, id, x, y, width, height FROM `oceanic-granite-413404.HighD_tracks.{table_name}`
@@ -41,11 +42,12 @@ def query_database(table_name, vehicle_id):
         query_job = bigquery_client.query(query)
         results = query_job.result()
         df = results.to_dataframe()
-        return df
+        return df # return as a df for processing
     except Exception as e:
         print(f"Failed to execute BigQuery query: {e}")
         return None
 
+# Parses the table name for the numerical ID
 def get_table_id(table_name):
     parts = table_name.split("_")
     try:
@@ -55,7 +57,7 @@ def get_table_id(table_name):
         print(f"Failed to convert table name to int: {e}")
         return None
     
-
+# Queries the HighD_recording_meta dataset to find the lane markings to be used in the video
 def query_recording_meta(table_id):
         
     query = f"""
@@ -75,6 +77,7 @@ def query_recording_meta(table_id):
         print(f'Failed to execute BigQuery query: {e}')
         return None
 
+# Opens the background image corresponding to the table_id for the video background
 def open_image_from_gcs(table_id):
     if table_id < 10 and table_id > 0:
         table_id = f'0{table_id}'
@@ -175,6 +178,7 @@ def create_video(table_name, vehicle_id, numLaneChanges):
                                 fargs=(scenario_data, vehicle_id, ax, highway_image, fig, upper_lane_markings, lower_lane_markings), interval=100)
 
     
+    # Assign folder name corresponding to scenario type
     if numLaneChanges > 0:
         folder_name = 'videos/lane_changes_occurred'
     else:
@@ -187,6 +191,7 @@ def create_video(table_name, vehicle_id, numLaneChanges):
     writer = FFMpegWriter(fps=10, metadata=dict(artist='Me'), bitrate=1800)
     ani.save(video_file_name, writer=writer)
 
+    # Uploads video to the folder
     destination_blob_name = f'{folder_name}/{video_file_name}'
 
     blob = bucket.blob(destination_blob_name)
@@ -198,16 +203,11 @@ def create_video(table_name, vehicle_id, numLaneChanges):
 
 
 @app.post("/create-video/")
-async def create_video_api(video_request: VideoRequest):
+def create_video_api(video_request: VideoRequest):
     try:
-        # Asynchronously call the create_video function
-        # Use asyncio to run create_video in a way that doesn't block the server
-        # Assuming create_video is adapted to work asynchronously or its blocking nature is acceptable for this use case
-        # If create_video can't be made async, consider running it in a background thread or process
-        await asyncio.to_thread(create_video, video_request.table_name, video_request.vehicle_id, video_request.numLaneChanges)
+        create_video(video_request.table_name, video_request.vehicle_id, video_request.numLaneChanges)
         
-        # Here, you should return the location of the generated video or a success message
-        return {"message": "Video processing started", "table_name": video_request.table_name, "vehicle_id": video_request.vehicle_id, "numLaneChanges": video_request.numLaneChanges}
+        return {"message": "Video processing finished", "table_name": video_request.table_name, "vehicle_id": video_request.vehicle_id, "numLaneChanges": video_request.numLaneChanges}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -215,4 +215,3 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
-#create_video('01_tracks', 50, True)
