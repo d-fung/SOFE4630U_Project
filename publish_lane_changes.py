@@ -29,7 +29,7 @@ def publish_message(topic_name, data):
         print(f"An error occurred: {e}")
 
 def query_and_publish():
-    # Define your BigQuery SQL query
+    # BigQuery SQL query
     query = """
     SELECT numLaneChanges, id, table_name FROM `HighD_meta_filtered.data`
     """

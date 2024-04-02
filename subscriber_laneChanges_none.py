@@ -8,7 +8,7 @@ subscription_id = "laneChanges_none-sub"
 subscriber = pubsub_v1.SubscriberClient()
 subscription_path = subscriber.subscription_path(project_id, subscription_id)
 
-fastapi_url = 'http://your-fastapi-service-url/create-video/'
+fastapi_url = '"http://127.0.0.1:8000/create-video/"'
 
 
 def callback(message):

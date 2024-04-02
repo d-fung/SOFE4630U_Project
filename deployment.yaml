@@ -11,7 +11,11 @@ spec:
     metadata:
       labels:
         app: visualizer-api
+      namespace: default
     spec:
+      serviceAccountName: project
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: "true"
       containers:
       - name: visualizer-api
         image: northamerica-northeast2-docker.pkg.dev/oceanic-granite-413404/sofe4630u/visualizer_api
